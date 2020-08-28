@@ -61,15 +61,22 @@ class Speed():
     def __init__(self ):
 
         # a variable that holds buff value
-        self.percent = 0
+        self.percent = []
 
         # a list that holds monster speed at all ranks
         self.spd = []
 
+        self.assign()
+
+    def assign(self):
+        for i in range(0 , 11) :
+            self.percent.append(0)
+
     def get_speed(self , urls):
 
         # resets perent to 0 each time a new monster is searched for
-        self.percent = 0
+        for i in range(len(self.percent)):
+            self.percent[i] = 0
     
         # a variable that hold monster name
         Monster_name = fix(urls)
@@ -114,13 +121,12 @@ class Speed():
         if rank == '':
             return self.spd[0]
 
-
         val = RANKS[rank]
 
         # return speed for the selected rank
         return self.spd[val]
 
-    def update_speed(self , val ,base, teamspeed = False): 
+    def update_speed(self , val ,base,  index  , teamspeed = False): 
 
         # replace the , with nothing to avoid errors
         base_Spd = base.replace(',' , '')
@@ -135,11 +141,16 @@ class Speed():
             value = SPEED[val] 
 
         # adds the rune value to percent value
-        self.percent += value
+        self.percent[index] = value
 
         # buff calculations below
+        actual_percent = 0
+        
+        for i in self.percent:
+            actual_percent += i
+
         new_spd = int(base_Spd)
-        new_spd += self.percent * new_spd
+        new_spd += actual_percent * new_spd
         round(new_spd)
 
         return int(new_spd)
@@ -151,10 +162,16 @@ class Speed():
 
         value = RUNE_GUARDIAN[val]
 
-        self.percent += value
+        self.percent[10] = value
+
+        # buff calculations below
+        actual_percent = 0
+        
+        for i in self.percent:
+            actual_percent += i
 
         new_spd = int(base_Spd)
-        new_spd += self.percent * new_spd
+        new_spd += actual_percent * new_spd
         round(new_spd)
 
         return int(new_spd)
@@ -190,21 +207,21 @@ def my_form_post():
 def onchange():
 
     # a function called when a rune is selected 
-
     if request.method == 'POST':
         val = request.form['value']
         base = request.form['base']
+        index = request.form['index']
         spd = 0
 
         if 'TEAM' in val:
-           spd = CLC.update_speed(val , base, True)
+           spd = CLC.update_speed(val , base,  int(index) ,True)
            return str(spd)
         else:
-           spd = CLC.update_speed(val , base )  
+           spd = CLC.update_speed(val , base , int(index) )  
            return str(spd)
         
 
-    return 'ok'
+    return 200
 
 @app.route('/rank_onchange' , methods=['POST'])  
 def rank_onchange():
@@ -232,4 +249,4 @@ def gaurdian_onchange():
     return 200
 
 if __name__ == "__main__":
-    app.run(debug=True)
+    app.run()
