@@ -10,7 +10,6 @@ button.onclick = async () => {
 
   form_data.append('name', number);
   form_data.append('rank' , rank);
-  console.log(rank)
 
   const response = await fetch("/fu",
     {
@@ -26,23 +25,21 @@ button.onclick = async () => {
 let speed = document.querySelectorAll('.select-speed');
 
 for (let i = 0;i < speed.length;i++) {
- 
+  
 
   speed[i].onchange = async () => {
 
     let num = document.getElementById("base_speed").value
-    let update = document.getElementById('updated_speed').value
-
-    if( num == ''){
-      update = 'invalid value'
-    }
 
     let val = speed[i].value
 
     let form_data = new FormData();
 
+    let id = i
+
     form_data.append('value' , val)
     form_data.append('base' , num)
+    form_data.append('index' , id)
 
     const response = await fetch("/on",
       {
@@ -53,8 +50,7 @@ for (let i = 0;i < speed.length;i++) {
 
     const text = await response.text()
 
-    update = text
-
+    let update = document.getElementById('updated_speed').value = text
 };};
 
 let rank = document.getElementById('ranks')
